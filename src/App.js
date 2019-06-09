@@ -22,7 +22,9 @@ const Container = styled.div`
 
 const App = () => {
   const [selections, setSelections] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const imgRef = useRef(null);
+  const imgContainer = useRef(null);
 
   /**
    * Helper function to ensure that top-left point is used as origin and calculates the size.
@@ -30,8 +32,11 @@ const App = () => {
    * @return {Object}           The start coordinates and the size.
    */
   const formatSelection = (selection, index) => {
+    if (!selection.target) {
+      return selection;
+    }
     // Get correct offset.
-    const img = imgRef.current;
+    const img = imgContainer.current;
     const offsetL = img.offsetLeft;
     const offsetT = img.offsetTop;
 
@@ -39,14 +44,12 @@ const App = () => {
     const start = selection.origin[0] < selection.target[0] ? selection.origin : selection.target;
     const end = selection.origin[0] < selection.target[0] ? selection.target : selection.origin;
 
-    // Correct coodinates with the offset.
-    start[0] -= offsetL;
-    start[1] -= offsetT;
-    end[0] -= offsetL;
-    end[1] -= offsetT;
-
     return {
-      start,
+      origin: [...start],
+      start: [
+        start[0] - offsetL,
+        start[1] - offsetT,
+      ],
       size: [
         end[0] - start[0],
         end[1] - start[1],
@@ -55,35 +58,44 @@ const App = () => {
   };
 
   /**
-   * Adds a rectangle to the list of selections.
-   * @param {Object} selection The coordinates of the selection.
+   * Adds or updates a rectangle to the list of selections.
+   * @param  {int}    index     The index in the selections array.
+   * @param  {Object} selection The coordinates of the selection.
+   * @return {Object} The coordinates object.
    */
-  const addSelection = (selection) => {
-    // Find the first available unused selection. Do nothing if none is found.
-    const replaceIndex = selections.findIndex((item) => item === undefined);
-    if (replaceIndex < 0) {
-      return;
+  const addSelection = (index, selection) => {
+    if (index >= selections.length) {
+      return undefined;
     }
     // Replace the empty selection.
-    selections[replaceIndex] = formatSelection(selection);
-    setSelections([...selections])
+    selections[index] = {
+      ...selections[index],
+      ...formatSelection(selection)
+    };
+    setSelections([...selections]);
+    return selections[index];
   };
 
   /**
    * Add and empty selection the the selections array.
    */
-  const addEmptySelection = () => setSelections([
-    ...selections,
-    undefined
-  ]);
+  const addEmptySelection = () => {
+    setSelections([
+      ...selections,
+      undefined
+    ]);
+    setCurrentIndex(selections.length);
+  };
 
   return (
     <Main className="App">
       <Container>
         <BigImage
           addSelection={ addSelection }
+          currentIndex={ currentIndex }
           img={ image }
           imgRef={ imgRef }
+          imgContainer={ imgContainer }
         />
         <SelectedList
           addEmptySelection={ addEmptySelection }

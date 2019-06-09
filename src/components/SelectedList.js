@@ -5,6 +5,7 @@ const Container = styled.div`
   background-color: #fff;
   padding: 30px 0 0 25px;
   width: 300px;
+  z-index: 2;
 `;
 
 const AddSelectionButton = styled.button`
@@ -60,7 +61,7 @@ const SelectedList = ({ addEmptySelection, imgRef, selections }) => {
       const [sizeX, sizeY] = selections[index].size;
       ctx.drawImage(img, startX, startY, sizeX, sizeY, 0, 0, 75, 75);
     });
-  });
+  }, [selections, imgRef]);
 
   return (
     <Container>
