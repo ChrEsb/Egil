@@ -35,7 +35,7 @@ const BigImage = ({ addSelection, currentIndex, img, imgRef, imgContainer }) => 
     setSelecting(false);
     setCurrent({});
     setRectState({
-      ...rectState,
+      offsetCorrection: !currentIndex,
       left: 0,
       top: 0,
       width: 0,
@@ -73,7 +73,6 @@ const BigImage = ({ addSelection, currentIndex, img, imgRef, imgContainer }) => 
         height: selected.size[1],
         width: selected.size[0],
       });
-      console.log('test');
       setActiveSelection(true);
     }
     setSelecting(false);

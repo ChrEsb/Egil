@@ -80,6 +80,10 @@ const App = () => {
    * Add and empty selection the the selections array.
    */
   const addEmptySelection = () => {
+    // Only add new selection if the previous has been filled with a value.
+    if (selections.length >= 1 && selections[selections.length - 1] === undefined) {
+      return;
+    }
     setSelections([
       ...selections,
       undefined
